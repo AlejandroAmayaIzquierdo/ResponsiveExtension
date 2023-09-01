@@ -10,25 +10,8 @@ const MultiResComponent: React.FC = () => {
     );
 }
 
-const body = document.querySelector('body');
-const app = document.createElement('div');
-app.id = 'react-root';
+const root = createRoot(document.getElementById("root")!);
 
-
-if (body) {
-    body.innerHTML = '';
-    body.append(app);
-}
-
-// Check if the element with id 'react-root' exists
-const existingRoot = document.getElementById('react-root');
-
-if (existingRoot) {
-    const root = createRoot(existingRoot);
-
-    root.render(
-        <Board />
-    );
-} else {
-    console.error("Element with id 'react-root' not found");
-}
+root.render(
+    <Board />
+);

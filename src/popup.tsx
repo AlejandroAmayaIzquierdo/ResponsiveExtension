@@ -33,7 +33,7 @@ const Popup = () => {
     });
     */
     // URL of the blank page or local HTML file you want to open
-    const newTabURL = "chrome-extension://okioaolbhppbjmdecjdcdomgfcjlmcpd/blank.html"; // Replace with the actual URL
+    const newTabURL = "chrome-extension://okioaolbhppbjmdecjdcdomgfcjlmcpd/index.html"; // Replace with the actual URL
 
     chrome.tabs.create({ url: newTabURL }, (tab) => {
       console.log("New tab created with ID:", tab.id);
