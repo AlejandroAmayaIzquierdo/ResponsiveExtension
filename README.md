@@ -1,4 +1,4 @@
-# Chrome Extension TypeScript Starter
+# Chrome Extension for visualize better responsive designs
 
 ![build](https://github.com/chibat/chrome-extension-typescript-starter/workflows/build/badge.svg)
 
