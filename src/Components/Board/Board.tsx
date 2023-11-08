@@ -1,55 +1,91 @@
-import React, { useState } from 'react';
-import RGL, { WidthProvider } from "react-grid-layout";
+import React, { useState, useEffect } from 'react';
+import Window, { WindowProps } from "../FloatingWindow/Window";
+import { getDeviceByKey } from '../../utils/WindowsOptions';
+import CommandMenu from '../Command/command';
 import "./Board.css";
+import { getLocalStorageItem } from '../../utils/handleLocalStorage';
+import { TYPES } from '../../utils/Interfaces';
+import { toast } from 'sonner'
+import Icon from 'react-cmdk/dist/components/Icon';
 
-const ReactGridLayout = WidthProvider(RGL);
 
-
-const contentStyle: React.CSSProperties = {
-    textAlign: 'center',
-    minHeight: 120,
-    lineHeight: '120px',
-    color: '#fff',
-    backgroundColor: '#108ee9',
-};
-const layoutInitialValue: RGL.Layout[] = [
-    { i: "1", x: 0, y: 0, w: 1, h: 2 },
-    { i: "2", x: 1, y: 0, w: 3, h: 2, minW: 2, maxW: 4 },
-    { i: "3", x: 4, y: 0, w: 1, h: 2 }
-];
 
 interface BoardProps {
-
+    url: string
 }
-const Board: React.FC<BoardProps> = () => {
+const Board: React.FC<BoardProps> = ({url}) => {
 
-    const [counter, setcounter] = useState<number>(3);
-    const [layout, setLayout] = useState<RGL.Layout[]>(layoutInitialValue);
+    const [layout, setLayout] = useState<WindowProps[]>([]);
 
-    const getId = (): string => {
-        setcounter(counter + 1);
-        return counter.toString();
+    const uid = (): string => {
+        return Date.now().toString(36) + Math.random().toString(36).substr(2);
     }
 
-    const handleAddItem = () => {
-        const id = getId();
-        const newItem: RGL.Layout = { i: id, x: 0, y: 0, w: 1, h: 1 }
+    const handleAddItem = (key: string) => {
+        const id = uid();
+        const device = getDeviceByKey(key);
+        const newItem: WindowProps = {
+            id: id,
+            height: device?.landscapeWidth,
+            width: device?.portraitWidth,
+            resizable: false,
+            titleBar: {
+                title: device?.name,
+                buttons: { minimize: true, maximize: true, close: true },
+            }
+        }
 
         setLayout([...layout, newItem]);
     }
+    const handleRemoveItem = (id: string) => {
+        const newLayout = layout.filter(e => e.id !== id);
 
+        setLayout(newLayout);
+    }
+
+    const handleLoadLayout = () => {
+        try {
+            const workspace = JSON.parse(getLocalStorageItem("workspace") || "") as TYPES.WorkSpace;
+
+            if (!workspace) toast.error("Error loading workspace");
+
+            setLayout(workspace.layout.map(window => {return {...window,initialLeft: window.left,initialTop: window.top}}) || []);
+
+            toast.success("WorkSpace  \"" + workspace.name + "\"  Loading correctly");
+        } catch (error) {
+            toast.error("Error loading workspace");
+        }
+
+    }
+
+    const handleWindowDragEnd = (item: WindowProps) => {
+        const index = layout.findIndex((window) => window.id === item.id);
+
+        if (index !== -1) {
+            const updatedLayout = [...layout];
+        
+            updatedLayout[index] = {...updatedLayout[index],...item};
+        
+            setLayout(updatedLayout);
+          }
+    }   
+
+    useEffect(() => {
+        handleLoadLayout();
+    }, []);
 
     return (
-        <ReactGridLayout onLayoutChange={(l) => { setLayout(l); }}>
-            <button onClick={handleAddItem}>Add item</button>
-            {layout.map((item) => {
+        <div className='react-grid-layout'>
+            {layout.map((window) => {
+
                 return (
-                    <div key={item.i}>
-                        <span>{item.i}</span>
-                    </div>
+                    <Window {...window} handleClose={(id) => { handleRemoveItem(id) }} onDragEnd={(item) => handleWindowDragEnd(item)} key={window.id} >
+                        <iframe className='innerContent' src={url}></iframe>
+                    </Window>
                 );
             })}
-        </ReactGridLayout>
+            <CommandMenu layout={layout} onAdWindow={handleAddItem} />
+        </div>
     );
 }
 

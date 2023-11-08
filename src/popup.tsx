@@ -1,13 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
+import "./styles.css";
 
 const Popup = () => {
-  const [count, setCount] = useState(0);
   const [currentURL, setCurrentURL] = useState<string>();
-
-  useEffect(() => {
-    chrome.action.setBadgeText({ text: count.toString() });
-  }, [count]);
 
   useEffect(() => {
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
@@ -16,24 +12,8 @@ const Popup = () => {
   }, []);
 
   const changeBackground = () => {
-    /*
-    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-      const tab = tabs[0];
-      if (tab.id) {
-        chrome.tabs.sendMessage(
-          tab.id,
-          {
-            color: "#555555",
-          },
-          (msg) => {
-            console.log("result message:", msg);
-          }
-        );
-      }
-    });
-    */
     // URL of the blank page or local HTML file you want to open
-    const newTabURL = "chrome-extension://okioaolbhppbjmdecjdcdomgfcjlmcpd/index.html"; // Replace with the actual URL
+    const newTabURL = `chrome-extension://okioaolbhppbjmdecjdcdomgfcjlmcpd/index.html?url=${currentURL}`; // Replace with the actual URL
 
     chrome.tabs.create({ url: newTabURL }, (tab) => {
       console.log("New tab created with ID:", tab.id);
@@ -41,26 +21,22 @@ const Popup = () => {
   };
 
   return (
-    <>
-      <ul style={{ minWidth: "700px" }}>
-        <li>Current URL: {currentURL}</li>
-        <li>Current Time: {new Date().toLocaleTimeString()}</li>
-      </ul>
-      <button
-        onClick={() => setCount(count + 1)}
-        style={{ marginRight: "5px" }}
-      >
-        count up
-      </button>
-      <button onClick={changeBackground}>change background</button>
-    </>
+    <div className="popup-container">
+      <div className="popup-content">
+        <div className="current-url">
+          <span>Current URL:</span>
+          <p>{currentURL}</p>
+        </div>
+        <button className="change-background-button" onClick={changeBackground}>
+          are you responsive?
+        </button>
+      </div>
+    </div>
   );
 };
 
 const root = createRoot(document.getElementById("root")!);
 
 root.render(
-  <React.StrictMode>
     <Popup />
-  </React.StrictMode>
 );

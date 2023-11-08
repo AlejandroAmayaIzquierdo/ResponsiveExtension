@@ -38,19 +38,6 @@
                 "run",
                 "watch"
             ]
-        },
-        {
-            "label": "customBuild",
-            "type": "shell",
-            "command": "powershell",
-            "args": [
-                "-File",
-                "${workspaceFolder}\\build.ps1"
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            }
         }
     ]
 }
