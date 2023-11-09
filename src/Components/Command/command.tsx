@@ -10,6 +10,9 @@ import "react-cmdk/dist/cmdk.css";
 import "./command.css";
 import { setLocalStorageItem } from '../../utils/handleLocalStorage';
 import Icon from 'react-cmdk/dist/components/Icon';
+import { COMMAND_PAGES } from '../../constants/CommandPages';
+import { useIntl } from 'react-intl';
+
 
 const COMMAND_KEY = 'p';
 
@@ -17,10 +20,14 @@ const resolutions = Object.entries(getAllWindowOptions());
 
 interface CommandMenuProps {
     layout?: WindowProps[];
-    onAdWindow?: (id: string) => void;
+    onAdWindow?: (id: string,resizable: boolean) => void;
+    onRemoveWindow?: (id: string) => void;
+    onClearBoard?: () => void;
 }
 
-const CommandMenu: React.FC<CommandMenuProps> = ({ layout, onAdWindow }) => {
+const CommandMenu: React.FC<CommandMenuProps> = ({ layout, onAdWindow,onClearBoard }) => {
+
+    const intl = useIntl();
 
     const [page, setPage] = useState<string>("root");
     const [open, setOpen] = useState<boolean>(false);
@@ -59,19 +66,32 @@ const CommandMenu: React.FC<CommandMenuProps> = ({ layout, onAdWindow }) => {
                         icon: "ChevronRightIcon",
                         closeOnSelect: false,
                         onClick: () => {
-                            setPage("addWindow");
+                            setPage(COMMAND_PAGES.ADD_WINDOW);
                             setSearch("");
                         }
                     },
                     {
-                        id: "addCustomWindow",
+                        id: "addResizableWindow",
                         children: "Add Custom window",
                         icon: "ChevronRightIcon",
+                        onClick: () => {
+                            if (onAdWindow)
+                                onAdWindow("custom",true);
+                            setPage(COMMAND_PAGES.ROOT);
+                            setSearch("");
+                        }
                     },
                     {
-                        id: "settings",
-                        children: "Remove Window",
+                        id: "clearBoard",
+                        children: "Clear Board",
                         icon: "ChevronRightIcon",
+                        onClick: () => {
+                            if(onClearBoard)
+                                onClearBoard();
+                            setPage(COMMAND_PAGES.ROOT);
+                            setSearch("");
+
+                        }
                     }
                 ],
             }
@@ -90,7 +110,9 @@ const CommandMenu: React.FC<CommandMenuProps> = ({ layout, onAdWindow }) => {
                         children: value[1].name,
                         onClick: () => {
                             if (onAdWindow)
-                                onAdWindow(value[0]);
+                                onAdWindow(value[0],false);
+                            setPage(COMMAND_PAGES.ROOT);
+                            setSearch("");
                         }
                     }
                 })
@@ -115,7 +137,7 @@ const CommandMenu: React.FC<CommandMenuProps> = ({ layout, onAdWindow }) => {
 
     useEffect(() => {
         if (open) {
-            setPage("root");
+            setPage(COMMAND_PAGES.ROOT);
             setSearch("");
         }
     }, [open]);
@@ -131,7 +153,7 @@ const CommandMenu: React.FC<CommandMenuProps> = ({ layout, onAdWindow }) => {
                 page={page}
                 
             >
-                <CommandPalette.Page id="root">
+                <CommandPalette.Page id={COMMAND_PAGES.ROOT}>
                     {filteredItems.length ? (
                         filteredItems.map((list) => (
                             <CommandPalette.List key={list.id} heading={list.heading}>
@@ -149,7 +171,7 @@ const CommandMenu: React.FC<CommandMenuProps> = ({ layout, onAdWindow }) => {
                     )}
                 </CommandPalette.Page>
 
-                <CommandPalette.Page id="addWindow">
+                <CommandPalette.Page id={COMMAND_PAGES.ADD_WINDOW}>
                     {windowsFilter.length ? (
                         windowsFilter.map((list) => (
                             <CommandPalette.List key={list.id}>
@@ -167,7 +189,7 @@ const CommandMenu: React.FC<CommandMenuProps> = ({ layout, onAdWindow }) => {
             </CommandPalette>
             <div className='settings-Button' onClick={() => setOpen(true)}><Icon name='Cog6ToothIcon' scale={10}/></div>
             <div className='hint-text'>
-            Press 'Ctrl + p' to open settings
+                {intl.formatMessage({id:"page.hint"})}
             </div>
         </>
         

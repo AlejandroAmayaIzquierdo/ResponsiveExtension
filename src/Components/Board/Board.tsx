@@ -21,14 +21,14 @@ const Board: React.FC<BoardProps> = ({url}) => {
         return Date.now().toString(36) + Math.random().toString(36).substr(2);
     }
 
-    const handleAddItem = (key: string) => {
+    const handleAddItem = (key: string,resizable: boolean = false) => {
         const id = uid();
         const device = getDeviceByKey(key);
         const newItem: WindowProps = {
             id: id,
             height: device?.landscapeWidth,
             width: device?.portraitWidth,
-            resizable: false,
+            resizable: resizable,
             titleBar: {
                 title: device?.name,
                 buttons: { minimize: true, maximize: true, close: true },
@@ -68,7 +68,11 @@ const Board: React.FC<BoardProps> = ({url}) => {
         
             setLayout(updatedLayout);
           }
-    }   
+    }
+    
+    const handleClearBoard = () => {
+        setLayout([]);
+    }
 
     useEffect(() => {
         handleLoadLayout();
@@ -84,7 +88,7 @@ const Board: React.FC<BoardProps> = ({url}) => {
                     </Window>
                 );
             })}
-            <CommandMenu layout={layout} onAdWindow={handleAddItem} />
+            <CommandMenu layout={layout} onAdWindow={handleAddItem} onClearBoard={handleClearBoard} />
         </div>
     );
 }

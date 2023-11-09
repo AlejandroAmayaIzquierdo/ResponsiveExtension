@@ -5,6 +5,11 @@ export interface resolutionsInterface {
 }
 
 export const resolutions = {
+    "custom" : {
+        "portraitWidth": 375,
+        "landscapeWidth": 812,
+        "name": "custom Resolution"
+    },
     "iphone4": {
         "portraitWidth": 320,
         "landscapeWidth": 480,
