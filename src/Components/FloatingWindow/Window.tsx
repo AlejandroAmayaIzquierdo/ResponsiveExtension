@@ -64,8 +64,8 @@ const Window = forwardRef<any,WindowProps>(({
   const [isResolutionInfoShow, setIsResolutionInfoShow] = useState<boolean>(false);
 
   const styles: React.CSSProperties = {
-    height: height,
-    width: width,
+    height: currentHeight,
+    width: currentWith,
     top: top,
     left: left,
     zIndex: level,
@@ -76,7 +76,7 @@ const Window = forwardRef<any,WindowProps>(({
     setYOffset(e.clientY - top);
     setXOffset(e.clientX - left);
     setLevel(nextZIndex());
-    setVisibility(0.5);
+    setVisibility(0.65);
   };
 
   const handleDrag = (e: React.DragEvent<HTMLSpanElement>) => {
@@ -115,7 +115,7 @@ const Window = forwardRef<any,WindowProps>(({
     setVisibility(1.0);
 
 
-    if(onDragEnd) onDragEnd({id,top,left});
+    if(onDragEnd) onDragEnd({id,top,left,width: currentWith,height: currentHeight});
   };
 
   useImperativeHandle(ref, () => ({
@@ -125,23 +125,27 @@ const Window = forwardRef<any,WindowProps>(({
       setTop(top);
     },
     checkVisibility() {
-      const maxLeftLimit = window.innerWidth - marginLimits;
-      const maxTopLimit = window.innerHeight - marginLimits;
-  
-  
-      if(left < 0)
-        setLeft(marginLimits);
-      else if(left + currentWith > maxLeftLimit)
-        setLeft(maxLeftLimit - currentWith);
-  
-  
-      if(top < 0)
-        setTop(marginLimits);
-      else if(top + currentHeight > maxTopLimit && currentHeight < maxTopLimit)
-        setTop(maxTopLimit - currentHeight);
+      handleVisibility();
     }
 
   }));
+
+  const handleVisibility = () => {
+    const maxLeftLimit = window.innerWidth - marginLimits;
+    const maxTopLimit = window.innerHeight - marginLimits;
+
+
+    if(left < 0)
+      setLeft(marginLimits);
+    else if(left + currentWith > maxLeftLimit)
+      setLeft(maxLeftLimit - currentWith);
+
+
+    if(top < 0)
+      setTop(marginLimits);
+    else if(top + currentHeight > maxTopLimit && currentHeight < maxTopLimit)
+      setTop(maxTopLimit - currentHeight);
+  }
   useEffect(() => {
     if (!divRef.current) return;
 
@@ -161,6 +165,7 @@ const Window = forwardRef<any,WindowProps>(({
       clearTimeout(timeoutId);
 
       timeoutId = setTimeout(() => {
+        if(onDragEnd) onDragEnd({id,top,left,width: contentRect.width,height: contentRect.height});
         setIsResolutionInfoShow(false); //There is no way to know when its ended so i did this. 
       }, 500);
     });
@@ -170,10 +175,33 @@ const Window = forwardRef<any,WindowProps>(({
     return () => resizeObserver.disconnect();
   }, []);
 
+  useEffect(() => {
+    handleVisibility();
+  }, [])
+  
+
 
   
-  const handleMinimize = () => {}; //TODO hide it on the bottom like the whisper from twitch
-  const handleMaximize = () => {}; //TODO maximize at the size of the curren chrome size
+  const handleMinimize = () => {
+
+    setCurrentWith(width);
+    setCurrentHeight(height);
+
+
+    setLevel(nextZIndex());
+  }; 
+  const handleMaximize = () => {
+    setLeft(marginLimits);
+    setTop(marginLimits);
+
+    setCurrentWith(window.innerWidth - (marginLimits * 3));
+    setCurrentHeight(window.innerHeight - (marginLimits * 3));
+
+
+    setLevel(nextZIndex());
+
+    
+  }; 
 
   return (
     <div
@@ -197,13 +225,19 @@ const Window = forwardRef<any,WindowProps>(({
           {titleBar.buttons && (
             <div className="buttonContainer">
               {titleBar.buttons.minimize && (
-                <button className="windowButton" onClick={() => { if (handleClose && id) handleClose(id); }} />
+                <button className="windowButton" onClick={() => { if (handleClose && id) handleClose(id); }}>
+                  <Icon name="XMarkIcon" fontSize={100}/>
+                </button>
               )}
               {titleBar.buttons.maximize && (
-                <button className="windowButton" onClick={handleMaximize} />
+                <button className="windowButton" onClick={handleMinimize}>
+                  <Icon name="MinusIcon" fontSize={100}/>
+                </button>
               )}
               {titleBar.buttons.close && (
-                <button className="windowButton" onClick={handleMinimize} />
+                <button className="windowButton" onClick={handleMaximize}>
+                    <Icon name="PlusIcon" fontSize={100}/>
+                </button>
               )}
             </div>
           )}

@@ -54,9 +54,9 @@ const Board: React.FC<BoardProps> = ({url}) => {
 
             setLayout(workspace.layout.map(window => {return {...window,initialLeft: window.left,initialTop: window.top}}) || []);
 
-            toast.success("WorkSpace  \"" + workspace.name + "\"  Loading correctly");
+            toast.success("WorkSpace  \"" + workspace.name + "\"  Loading correctly");//TODO translate
         } catch (error) {
-            toast.error("Error loading workspace");
+            toast.error("Error loading workspace");//TODO translate
         }
 
     }
@@ -70,11 +70,17 @@ const Board: React.FC<BoardProps> = ({url}) => {
             updatedLayout[index] = {...updatedLayout[index],...item};
         
             setLayout(updatedLayout);
-          }
+        }
     }
     
     const handleClearBoard = () => {
         setLayout([]);
+    }
+    const handleCheckVisibility = () => {
+        windowRefs.forEach((windowRef) => {
+            if (windowRef.current?.checkVisibility) 
+                windowRef.current?.checkVisibility();
+          });
     }
 
     useEffect(() => {
@@ -83,16 +89,12 @@ const Board: React.FC<BoardProps> = ({url}) => {
 
     useEffect(() => {
         setWindowRefs(layout.map(() => React.createRef()));
+        handleCheckVisibility();
       }, [layout]);
     
 
     useEffect(() => {
-        console.log(windowRefs);
-        windowRefs.forEach((windowRef) => {
-            console.log(windowRef.current);
-            if (windowRef.current?.checkVisibility) 
-                windowRef.current?.checkVisibility();
-          });
+        handleCheckVisibility();
     }, [width,height])
     
 

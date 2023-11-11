@@ -29,7 +29,7 @@ const CommandMenu: React.FC<CommandMenuProps> = ({ layout, onAdWindow,onClearBoa
 
     const intl = useIntl();
 
-    const [page, setPage] = useState<string>("root");
+    const [page, setPage] = useState<string>(COMMAND_PAGES.ROOT);
     const [open, setOpen] = useState<boolean>(false);
     const [search, setSearch] = useState("");
 

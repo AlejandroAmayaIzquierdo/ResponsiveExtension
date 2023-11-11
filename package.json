@@ -1,6 +1,6 @@
 {
   "name": "responsive-extension",
-  "version": "1.0.0",
+  "version": "0.3.0",
   "description": "chrome-extension-typescript-starter",
   "main": "index.js",
   "scripts": {
