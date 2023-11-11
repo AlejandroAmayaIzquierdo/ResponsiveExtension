@@ -90,14 +90,15 @@
     top: 0;
     width: 50px;
     height: 50px;
-    color: rgba(200, 200, 200, 0.5); /* Adjust the color and opacity as desired */
-    backdrop-filter: blur(0.1px);
+    color: rgba(150, 150, 150, 0.5); /* Adjust the color and opacity as desired */
+    backdrop-filter: blur(0.5px);
     transition: filter 0.3s ease; /* Add transition for smooth effect */
     margin: 10px;
+    z-index: 99999999;
 
 }
 .settings-Button:hover {
-    color: rgba(200, 200, 200, 0.8); /* Adjust the color and opacity as desired */
-    filter: blur(0.8px); /* Apply blur effect on hover */
+    color: rgba(150, 150, 150, 0.8); /* Adjust the color and opacity as desired */
+    filter: blur(0.1px); /* Apply blur effect on hover */
 }
 

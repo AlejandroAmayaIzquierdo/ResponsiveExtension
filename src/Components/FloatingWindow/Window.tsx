@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState,useRef,useEffect, useImperativeHandle, forwardRef } from "react";
 import "./Window.css";
+import Icon from "react-cmdk/dist/components/Icon";
 
 const nextZIndex = () => {
   let maxZ = 0;
@@ -10,6 +11,7 @@ const nextZIndex = () => {
   return maxZ + 1;
 };
 
+const marginLimits: number = 10;
 
 export interface WindowProps {
   id?: string;
@@ -32,9 +34,11 @@ export interface WindowProps {
   };
   handleClose?: (id: string) => void;
   onDragEnd?: (item: WindowProps) => void;
+  updatePosition?: (left: number,top: number) => void;
+  checkVisibility?: () => void;
 }
 
-const Window: React.FC<WindowProps> = ({
+const Window = forwardRef<any,WindowProps>(({
   id,
   children,
   height = 100,
@@ -45,63 +49,138 @@ const Window: React.FC<WindowProps> = ({
   titleBar,
   handleClose,
   onDragEnd
-}) => {
+},ref) => {
 
+  const divRef = useRef(null);
 
-  const [top, setTop] = useState<number>(initialTop || 0);
-  const [left, setLeft] = useState<number>(initialLeft || 0);
+  const [top, setTop] = useState<number>(initialTop ?? 0);
+  const [left, setLeft] = useState<number>(initialLeft ?? 0);
   const [xOffset, setXOffset] = useState(0);
   const [yOffset, setYOffset] = useState(0);
   const [level, setLevel] = useState(nextZIndex());
-  const [visibility, setWindowVisibility] = useState<number>(1.0);
+  const [visibility, setVisibility] = useState<number>(1.0);
+  const [currentWith, setCurrentWith] = useState<number>(width);
+  const [currentHeight, setCurrentHeight] = useState<number>(height);
+  const [isResolutionInfoShow, setIsResolutionInfoShow] = useState<boolean>(false);
+
+  const styles: React.CSSProperties = {
+    height: height,
+    width: width,
+    top: top,
+    left: left,
+    zIndex: level,
+    opacity: visibility,
+  }
 
   const handleDragStart = (e: React.DragEvent<HTMLSpanElement>) => {
     setYOffset(e.clientY - top);
     setXOffset(e.clientX - left);
     setLevel(nextZIndex());
-    setWindowVisibility(0.5);
+    setVisibility(0.5);
   };
 
   const handleDrag = (e: React.DragEvent<HTMLSpanElement>) => {
-    setLeft((e.clientX || e.screenX || left + xOffset) - xOffset);
-    setTop((e.clientY || e.screenY || top + yOffset) - yOffset);
+    const leftPosition = (e.clientX || e.screenX || left + xOffset) - xOffset;
+    const topPosition = (e.clientY || e.screenY || top + yOffset) - yOffset;
+    
+    if(leftPosition > marginLimits && leftPosition + currentWith <= window.innerWidth - marginLimits)
+      setLeft(leftPosition);
+    if(topPosition > marginLimits && topPosition + currentHeight <= window.innerHeight - marginLimits)
+      setTop(topPosition);
   };
 
   const handleDragEnd = (e: React.DragEvent<HTMLSpanElement>) => {
-    setLeft((e.clientX || e.screenX) - xOffset);
-    setTop((e.clientY || e.screenY) - yOffset);
-    setWindowVisibility(1.0);
-    if(onDragEnd) onDragEnd({
-      id,
-      top,
-      left
-    });
+    
+    const maxLeftLimit = window.innerWidth - marginLimits;
+    const maxTopLimit = window.innerHeight - marginLimits;
+
+
+    let leftPosition = (e.clientX || e.screenX) - xOffset;
+    if(leftPosition < 0)
+      leftPosition = marginLimits;
+    else if(leftPosition + currentWith > maxLeftLimit)
+      leftPosition = maxLeftLimit - currentWith;
+
+
+    let topPosition = (e.clientY || e.screenY) - yOffset
+    if(topPosition < 0)
+      topPosition = marginLimits;
+    else if(topPosition + currentHeight > maxTopLimit && currentHeight < maxTopLimit)
+      topPosition = maxTopLimit - currentHeight;
+
+
+    setLeft(leftPosition);
+    setTop(topPosition);
+    
+    setVisibility(1.0);
+
+
+    if(onDragEnd) onDragEnd({id,top,left});
   };
 
-  const handleMinimize = () => {};
+  useImperativeHandle(ref, () => ({
 
-  const handleMaximize = () => {};
+    updatePosition(left: number,top: number) {
+      setLeft(left);
+      setTop(top);
+    },
+    checkVisibility() {
+      const maxLeftLimit = window.innerWidth - marginLimits;
+      const maxTopLimit = window.innerHeight - marginLimits;
+  
+  
+      if(left < 0)
+        setLeft(marginLimits);
+      else if(left + currentWith > maxLeftLimit)
+        setLeft(maxLeftLimit - currentWith);
+  
+  
+      if(top < 0)
+        setTop(marginLimits);
+      else if(top + currentHeight > maxTopLimit && currentHeight < maxTopLimit)
+        setTop(maxTopLimit - currentHeight);
+    }
+
+  }));
+  useEffect(() => {
+    if (!divRef.current) return;
+
+    let timeoutId: NodeJS.Timeout; 
+
+    const resizeObserver = new ResizeObserver((container) => {
+      if (container.length <= 0) return;
+
+      const { contentRect } = container[0];
+
+      //TODO set limits to resizing.
+      setCurrentWith(contentRect.width);
+      setCurrentHeight(contentRect.height);
+
+      setIsResolutionInfoShow(true);
+
+      clearTimeout(timeoutId);
+
+      timeoutId = setTimeout(() => {
+        setIsResolutionInfoShow(false); //There is no way to know when its ended so i did this. 
+      }, 500);
+    });
+    resizeObserver.observe(divRef.current);
+
+    // Wrap your disconnect logic in a check for component mount status
+    return () => resizeObserver.disconnect();
+  }, []);
+
+
+  
+  const handleMinimize = () => {}; //TODO hide it on the bottom like the whisper from twitch
+  const handleMaximize = () => {}; //TODO maximize at the size of the curren chrome size
 
   return (
     <div
       id={id}
+      ref={divRef}
       className="window-container"
-      style={!resizable ? {
-        height: height,
-        width: width,
-        top: top,
-        left: left,
-        zIndex: level,
-        opacity: visibility,
-      } : {
-        height: height,
-        width: width,
-        top: top,
-        left: left,
-        resize : "both",
-        zIndex: level,
-        opacity: visibility,
-      }}
+      style={!resizable ? styles : {...styles , resize : "both"}}
       onClick={() => {
         setLevel(nextZIndex());
       }}
@@ -110,9 +189,7 @@ const Window: React.FC<WindowProps> = ({
         <div
           className="title-bar"
           data-parent={id}
-          style={{
-            opacity: visibility,
-          }}
+          style={{opacity: visibility}}
         >
           {titleBar.icon && (
             <span className="icon">{titleBar.icon}</span>
@@ -148,12 +225,21 @@ const Window: React.FC<WindowProps> = ({
       <div
         className="content"
         draggable={false}
-        style={{ overflow: "hidden", height: "100%" }}
+        style={{ overflow: "hidden", height: "100%",position:"relative" }}
       >
+        {isResolutionInfoShow && (
+          <div className="informationWindow">
+            <Icon style={{position: "absolute", left: "0%",bottom: "0%" , height: "75px",color:  "white"}} name='ArrowDownLeftIcon'/>
+            <Icon style={{position: "absolute", right: "0%",bottom: "0%" , height: "75px",color:  "white"}} name='ArrowDownRightIcon'/>
+            <Icon style={{position: "absolute", left: "0%",top: "0%" , height: "75px",color:  "white"}} name='ArrowUpLeftIcon'/>
+            <Icon style={{position: "absolute", right: "0%",top: "0%" , height: "75px",color:  "white"}} name='ArrowUpRightIcon'/>
+            <h1>Resolution: "{currentWith.toFixed(0)}x{currentHeight.toFixed(0)}"</h1>
+          </div>
+        )}
         {children}
       </div>
     </div>
   );
-};
+});
 
 export default Window;

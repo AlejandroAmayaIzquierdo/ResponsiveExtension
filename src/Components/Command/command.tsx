@@ -175,13 +175,15 @@ const CommandMenu: React.FC<CommandMenuProps> = ({ layout, onAdWindow,onClearBoa
                     {windowsFilter.length ? (
                         windowsFilter.map((list) => (
                             <CommandPalette.List key={list.id}>
-                                {list.items.map(({ id, ...rest }) => (
+                                {list.items.map(({ id, ...rest }) => {
+                                    if(id === "custom") return (<></>);
+                                    return(
                                     <CommandPalette.ListItem
                                         key={id}
                                         index={getItemIndex(windowsFilter, id)}
                                         {...rest}
                                     />
-                                ))}
+                                )})}
                             </CommandPalette.List>
                         ))
                     ) : (<CommandPalette.FreeSearchAction />)}

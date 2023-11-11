@@ -8,7 +8,7 @@ export const resolutions = {
     "custom" : {
         "portraitWidth": 375,
         "landscapeWidth": 812,
-        "name": "custom Resolution"
+        "name": "Custom Resolution"
     },
     "iphone4": {
         "portraitWidth": 320,

@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Window, { WindowProps } from "../FloatingWindow/Window";
 import { getDeviceByKey } from '../../utils/WindowsOptions';
 import CommandMenu from '../Command/command';
 import "./Board.css";
 import { getLocalStorageItem } from '../../utils/handleLocalStorage';
 import { TYPES } from '../../utils/Interfaces';
-import { toast } from 'sonner'
-import Icon from 'react-cmdk/dist/components/Icon';
+import { toast } from 'sonner';
+import useWindowDimensions from '../../hooks/useWindowDimensions';
 
 
 
@@ -15,7 +15,10 @@ interface BoardProps {
 }
 const Board: React.FC<BoardProps> = ({url}) => {
 
+    const { height, width } = useWindowDimensions();
+
     const [layout, setLayout] = useState<WindowProps[]>([]);
+    const [windowRefs, setWindowRefs] = useState<React.RefObject<WindowProps>[]>(layout.map(() => React.createRef()));
 
     const uid = (): string => {
         return Date.now().toString(36) + Math.random().toString(36).substr(2);
@@ -78,12 +81,32 @@ const Board: React.FC<BoardProps> = ({url}) => {
         handleLoadLayout();
     }, []);
 
+    useEffect(() => {
+        setWindowRefs(layout.map(() => React.createRef()));
+      }, [layout]);
+    
+
+    useEffect(() => {
+        console.log(windowRefs);
+        windowRefs.forEach((windowRef) => {
+            console.log(windowRef.current);
+            if (windowRef.current?.checkVisibility) 
+                windowRef.current?.checkVisibility();
+          });
+    }, [width,height])
+    
+
     return (
         <div className='react-grid-layout'>
-            {layout.map((window) => {
+            {layout.map((window, index) => {
 
                 return (
-                    <Window {...window} handleClose={(id) => { handleRemoveItem(id) }} onDragEnd={(item) => handleWindowDragEnd(item)} key={window.id} >
+                    <Window 
+                    {...window}
+                    key={window.id}
+                    ref={windowRefs[index]}
+                    handleClose={(id) => { handleRemoveItem(id) }} 
+                    onDragEnd={(item) => handleWindowDragEnd(item)}  >
                         <iframe className='innerContent' src={url}></iframe>
                     </Window>
                 );
