@@ -4,67 +4,56 @@
 
 Chrome Extension, TypeScript and Visual Studio Code
 
-## Prerequisites
+# Privacy Policy for Responsive Design Checker Extension
 
-* [node + npm](https://nodejs.org/) (Current Version)
+## Overview
 
-## Option
+This Privacy Policy describes how the Responsive Design Checker Extension ("the Extension") collects, uses, and stores information. The Extension is designed for developers to check the responsiveness of their designs.
 
-* [Visual Studio Code](https://code.visualstudio.com/)
+## Information Collected
 
-## Includes the following
+The Extension collects and stores the layout information of different windows that the user can open within the Extension. The collected data includes:
 
-* TypeScript
-* Webpack
-* React
-* Jest
-* Example Code
-    * Chrome Storage
-    * Options Version 2
-    * content script
-    * count up badge number
-    * background
+```json
+{
+  "name": "Default Layout",
+  "layout": [
+    {
+      "id": "loun81wrl85quxllwgs",
+      "height": 360.9375,
+      "width": 617.96875,
+      "resizable": true,
+      "titleBar": {
+        "title": "Custom Resolution",
+        "buttons": {
+          "minimize": true,
+          "maximize": true,
+          "close": true
+        }
+      },
+      "top": 333.015625,
+      "left": 201.0625,
+      "initialLeft": 201.0625,
+      "initialTop": 333.015625
+    },
+    {
+      "id": "lovw669vfzrz269lo75",
+      "height": 567.96875,
+      "width": 320,
+      "resizable": false,
+      "titleBar": {
+        "title": "iPhone 5c",
+        "buttons": {
+          "minimize": true,
+          "maximize": true,
+          "close": true
+        }
+      },
+      "top": 277,
+      "left": 1563,
+      "initialLeft": 1563,
+      "initialTop": 277
+    }
+  ]
+}
 
-## Project Structure
-
-* src/typescript: TypeScript source files
-* src/assets: static files
-* dist: Chrome Extension directory
-* dist/js: Generated JavaScript files
-
-## Setup
-
-```
-npm install
-```
-
-## Import as Visual Studio Code project
-
-...
-
-## Build
-
-```
-npm run build
-```
-
-## Build in watch mode
-
-### terminal
-
-```
-npm run watch
-```
-
-### Visual Studio Code
-
-Run watch mode.
-
-type `Ctrl + Shift + B`
-
-## Load extension to chrome
-
-Load `dist` directory
-
-## Test
-`npx jest` or `npm run test`
