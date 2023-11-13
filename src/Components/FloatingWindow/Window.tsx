@@ -1,4 +1,4 @@
-import React, { useState,useRef,useEffect, useImperativeHandle, forwardRef } from "react";
+import React, { useState,useRef,useEffect, useImperativeHandle, forwardRef,useMemo } from "react";
 import "./Window.css";
 import Icon from "react-cmdk/dist/components/Icon";
 
@@ -62,6 +62,9 @@ const Window = forwardRef<any,WindowProps>(({
   const [currentWith, setCurrentWith] = useState<number>(width);
   const [currentHeight, setCurrentHeight] = useState<number>(height);
   const [isResolutionInfoShow, setIsResolutionInfoShow] = useState<boolean>(false);
+
+  const [initialWith] = useState(width);
+  const [initialHeight] = useState(height);
 
   const styles: React.CSSProperties = {
     height: currentHeight,
@@ -166,8 +169,8 @@ const Window = forwardRef<any,WindowProps>(({
 
       timeoutId = setTimeout(() => {
         if(onDragEnd) onDragEnd({id,top,left,width: contentRect.width,height: contentRect.height});
-        setIsResolutionInfoShow(false); //There is no way to know when its ended so i did this. 
-      }, 500);
+        setIsResolutionInfoShow(false); 
+      }, 500); //There is no way to know when its ended so i did this. 
     });
     resizeObserver.observe(divRef.current);
 
@@ -178,19 +181,21 @@ const Window = forwardRef<any,WindowProps>(({
   useEffect(() => {
     handleVisibility();
   }, [])
-  
 
 
   
   const handleMinimize = () => {
+    if(!resizable) return;
 
-    setCurrentWith(width);
-    setCurrentHeight(height);
+    setCurrentWith(initialWith);
+    setCurrentHeight(initialHeight);
 
 
     setLevel(nextZIndex());
   }; 
   const handleMaximize = () => {
+    if(!resizable) return;
+
     setLeft(marginLimits);
     setTop(marginLimits);
 

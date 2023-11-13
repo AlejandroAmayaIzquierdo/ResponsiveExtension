@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import CommandPalette, { filterItems, getItemIndex } from "react-cmdk";
+
 import { getAllWindowOptions } from '../../utils/WindowsOptions';
 import { WindowProps } from '../FloatingWindow/Window';
 import { toast } from 'sonner'
-
 import { TYPES } from '../../utils/Interfaces';
+import { setLocalStorageItem } from '../../utils/handleLocalStorage';
+import { COMMAND_PAGES } from '../../constants/CommandPages';
+
+import { useIntl } from 'react-intl';
+
+import Icon from 'react-cmdk/dist/components/Icon';
 
 import "react-cmdk/dist/cmdk.css";
 import "./command.css";
-import { setLocalStorageItem } from '../../utils/handleLocalStorage';
-import Icon from 'react-cmdk/dist/components/Icon';
-import { COMMAND_PAGES } from '../../constants/CommandPages';
-import { useIntl } from 'react-intl';
+import { GithubOutlined,DatabaseOutlined } from '@ant-design/icons';
 
 
 const COMMAND_KEY = 'p';
@@ -36,12 +39,12 @@ const CommandMenu: React.FC<CommandMenuProps> = ({ layout, onAdWindow,onClearBoa
     const filteredItems = filterItems(
         [
             {
-                heading: "WorkSpace",
+                heading: intl.formatMessage({id:"page.WorkSpace"}),
                 id: "workspace",
                 items: [
                     {
                         id: "saveWorkSpace",
-                        children: "Save WorkSpace",
+                        children: intl.formatMessage({id:"settings.WorkSpace.save"}),
                         icon: "ChevronRightIcon",
                         onClick: () => {
                             if (!layout) return;
@@ -51,18 +54,18 @@ const CommandMenu: React.FC<CommandMenuProps> = ({ layout, onAdWindow,onClearBoa
                                 layout: layout.map(window => {return {...window}})
                             }
                             setLocalStorageItem("workspace", JSON.stringify(toSave));
-                            toast.success("WorkSpace Save");
+                            toast.success(intl.formatMessage({id:"toast.workspace.success"}));
                         }
                     }
                 ],
             },
             {
-                heading: "Windows",
+                heading: intl.formatMessage({id:"settings.windows"}),
                 id: "window",
                 items: [
                     {
                         id: "addWindow",
-                        children: "Add Preset window",
+                        children: intl.formatMessage({id:"settings.windows.addWindow"}),
                         icon: "ChevronRightIcon",
                         closeOnSelect: false,
                         onClick: () => {
@@ -72,7 +75,7 @@ const CommandMenu: React.FC<CommandMenuProps> = ({ layout, onAdWindow,onClearBoa
                     },
                     {
                         id: "addResizableWindow",
-                        children: "Add Custom window",
+                        children: intl.formatMessage({id:"settings.windows.addCustomWindow"}),
                         icon: "ChevronRightIcon",
                         onClick: () => {
                             if (onAdWindow)
@@ -83,7 +86,7 @@ const CommandMenu: React.FC<CommandMenuProps> = ({ layout, onAdWindow,onClearBoa
                     },
                     {
                         id: "clearBoard",
-                        children: "Clear Board",
+                        children: intl.formatMessage({id:"settings.windows.clearBoard"}),
                         icon: "ChevronRightIcon",
                         onClick: () => {
                             if(onClearBoard)
@@ -94,7 +97,29 @@ const CommandMenu: React.FC<CommandMenuProps> = ({ layout, onAdWindow,onClearBoa
                         }
                     }
                 ],
-            }
+            },
+            {
+                heading: "About",
+                id: "about",
+                items: [
+                    {
+                        id: "Developer",
+                        children: "Developer",
+                        icon: ( () => <GithubOutlined style={{color: "white"}} rev={"test"} />),
+                        onClick: () => {
+                            window.open('https://github.com/AlejandroAmayaIzquierdo', '_blank');
+                        }
+                    },
+                    {
+                        id: "Repository",
+                        children: "Repository",
+                        icon: ( () => <DatabaseOutlined style={{color: "white"}} rev={"test"} />),
+                        onClick: () => {
+                            window.open('https://github.com/AlejandroAmayaIzquierdo/ResponsiveExtension', '_blank');
+                        }
+                    },
+                ],
+            },
         ],
         search
     );
@@ -102,7 +127,7 @@ const CommandMenu: React.FC<CommandMenuProps> = ({ layout, onAdWindow,onClearBoa
     const windowsFilter = filterItems(
         [
             {
-                heading: "Devices",
+                heading: intl.formatMessage({id:"settings.devices.tittle"}),
                 id: "Devices",
                 items: resolutions.map((value) => {
                     return {

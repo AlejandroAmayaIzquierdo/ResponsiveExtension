@@ -1,19 +1,26 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import Window, { WindowProps } from "../FloatingWindow/Window";
-import { getDeviceByKey } from '../../utils/WindowsOptions';
+
 import CommandMenu from '../Command/command';
-import "./Board.css";
+import useWindowDimensions from '../../hooks/useWindowDimensions';
+
+
+import { getDeviceByKey } from '../../utils/WindowsOptions';
 import { getLocalStorageItem } from '../../utils/handleLocalStorage';
 import { TYPES } from '../../utils/Interfaces';
 import { toast } from 'sonner';
-import useWindowDimensions from '../../hooks/useWindowDimensions';
+import { useIntl } from 'react-intl';
 
+
+import "./Board.css";
 
 
 interface BoardProps {
     url: string
 }
 const Board: React.FC<BoardProps> = ({url}) => {
+
+    const intl = useIntl();
 
     const { height, width } = useWindowDimensions();
 
@@ -38,13 +45,9 @@ const Board: React.FC<BoardProps> = ({url}) => {
             }
         }
 
-        setLayout([...layout, newItem]);
+        setLayout((prevLayout) => [...prevLayout, newItem]);
     }
-    const handleRemoveItem = (id: string) => {
-        const newLayout = layout.filter(e => e.id !== id);
-
-        setLayout(newLayout);
-    }
+    const handleRemoveItem = (id: string) => {console.log(layout.length,windowRefs.length); setLayout([...layout.filter(e => e.id !== id)]);}
 
     const handleLoadLayout = () => {
         try {
@@ -54,22 +57,23 @@ const Board: React.FC<BoardProps> = ({url}) => {
 
             setLayout(workspace.layout.map(window => {return {...window,initialLeft: window.left,initialTop: window.top}}) || []);
 
-            toast.success("WorkSpace  \"" + workspace.name + "\"  Loading correctly");//TODO translate
+            toast.success(intl.formatMessage({id:"toast.load.success"}));
         } catch (error) {
-            toast.error("Error loading workspace");//TODO translate
+            toast.error(intl.formatMessage({id:"toast.error.loading"}));
         }
 
     }
 
     const handleWindowDragEnd = (item: WindowProps) => {
         const index = layout.findIndex((window) => window.id === item.id);
+        console.log(layout.find((window) => window.id === item.id));
 
         if (index !== -1) {
             const updatedLayout = [...layout];
         
             updatedLayout[index] = {...updatedLayout[index],...item};
         
-            setLayout(updatedLayout);
+            setLayout(updatedLayout); //FIXME error of creating old state of layout when resize. 
         }
     }
     
@@ -85,11 +89,12 @@ const Board: React.FC<BoardProps> = ({url}) => {
 
     useEffect(() => {
         handleLoadLayout();
+        setWindowRefs(layout.map(() => React.createRef()));
     }, []);
 
     useEffect(() => {
+        //FIXME bug when resize load the original layout or at least the last state. 😞
         setWindowRefs(layout.map(() => React.createRef()));
-        handleCheckVisibility();
       }, [layout]);
     
 
@@ -113,7 +118,7 @@ const Board: React.FC<BoardProps> = ({url}) => {
                     </Window>
                 );
             })}
-            <CommandMenu layout={layout} onAdWindow={handleAddItem} onClearBoard={handleClearBoard} />
+            <CommandMenu key={"commandMenu"} layout={layout} onAdWindow={handleAddItem} onClearBoard={handleClearBoard} />
         </div>
     );
 }
