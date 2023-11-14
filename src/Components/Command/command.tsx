@@ -45,6 +45,7 @@ const CommandMenu: React.FC<CommandMenuProps> = ({ layout, onAdWindow,onClearBoa
                     {
                         id: "saveWorkSpace",
                         children: intl.formatMessage({id:"settings.WorkSpace.save"}),
+                        key: "saveWorkSpacePage",
                         icon: "ChevronRightIcon",
                         onClick: () => {
                             if (!layout) return;
@@ -66,6 +67,7 @@ const CommandMenu: React.FC<CommandMenuProps> = ({ layout, onAdWindow,onClearBoa
                     {
                         id: "addWindow",
                         children: intl.formatMessage({id:"settings.windows.addWindow"}),
+                        key: "addWindowPage",
                         icon: "ChevronRightIcon",
                         closeOnSelect: false,
                         onClick: () => {
@@ -76,6 +78,7 @@ const CommandMenu: React.FC<CommandMenuProps> = ({ layout, onAdWindow,onClearBoa
                     {
                         id: "addResizableWindow",
                         children: intl.formatMessage({id:"settings.windows.addCustomWindow"}),
+                        key: "addResizableWindowPage",
                         icon: "ChevronRightIcon",
                         onClick: () => {
                             if (onAdWindow)
@@ -87,6 +90,7 @@ const CommandMenu: React.FC<CommandMenuProps> = ({ layout, onAdWindow,onClearBoa
                     {
                         id: "clearBoard",
                         children: intl.formatMessage({id:"settings.windows.clearBoard"}),
+                        key: "clearBoardPage",
                         icon: "ChevronRightIcon",
                         onClick: () => {
                             if(onClearBoard)
@@ -105,6 +109,7 @@ const CommandMenu: React.FC<CommandMenuProps> = ({ layout, onAdWindow,onClearBoa
                     {
                         id: "Developer",
                         children: "Developer",
+                        key: "DeveloperPage",
                         icon: ( () => <GithubOutlined style={{color: "white"}} rev={"test"} />),
                         onClick: () => {
                             window.open('https://github.com/AlejandroAmayaIzquierdo', '_blank');
@@ -113,6 +118,7 @@ const CommandMenu: React.FC<CommandMenuProps> = ({ layout, onAdWindow,onClearBoa
                     {
                         id: "Repository",
                         children: "Repository",
+                        key: "RepositoryPage",
                         icon: ( () => <DatabaseOutlined style={{color: "white"}} rev={"test"} />),
                         onClick: () => {
                             window.open('https://github.com/AlejandroAmayaIzquierdo/ResponsiveExtension', '_blank');
@@ -132,6 +138,7 @@ const CommandMenu: React.FC<CommandMenuProps> = ({ layout, onAdWindow,onClearBoa
                 items: resolutions.map((value) => {
                     return {
                         id: value[0],
+                        key: value[0] + Math.floor(Math.random() * 100),
                         children: value[1].name,
                         onClick: () => {
                             if (onAdWindow)
@@ -178,13 +185,13 @@ const CommandMenu: React.FC<CommandMenuProps> = ({ layout, onAdWindow,onClearBoa
                 page={page}
                 
             >
-                <CommandPalette.Page id={COMMAND_PAGES.ROOT}>
+                <CommandPalette.Page id={COMMAND_PAGES.ROOT} key={COMMAND_PAGES.ROOT}>
                     {filteredItems.length ? (
                         filteredItems.map((list) => (
                             <CommandPalette.List key={list.id} heading={list.heading}>
-                                {list.items.map(({ id, ...rest }) => (
+                                {list.items.map(({ id, ...rest },index) => (
                                     <CommandPalette.ListItem
-                                        key={id}
+                                        key={`${id}-${index}`}
                                         index={getItemIndex(filteredItems, id)}
                                         {...rest}
                                     />
@@ -196,22 +203,22 @@ const CommandMenu: React.FC<CommandMenuProps> = ({ layout, onAdWindow,onClearBoa
                     )}
                 </CommandPalette.Page>
 
-                <CommandPalette.Page id={COMMAND_PAGES.ADD_WINDOW}>
+                <CommandPalette.Page id={COMMAND_PAGES.ADD_WINDOW} key={COMMAND_PAGES.ADD_WINDOW}>
                     {windowsFilter.length ? (
-                        windowsFilter.map((list) => (
-                            <CommandPalette.List key={list.id}>
-                                {list.items.map(({ id, ...rest }) => {
+                        windowsFilter.map((list,index) => (
+                            <CommandPalette.List key={`${list.id}-${index}`}>
+                                {list.items.map(({ id,key, ...rest },index) => {
                                     if(id === "custom") return (<></>);
                                     return(
                                     <CommandPalette.ListItem
-                                        key={id}
+                                        key={`${id}-${index}`}
                                         index={getItemIndex(windowsFilter, id)}
                                         {...rest}
-                                    />
-                                )})}
+                                    />);
+                                })}
                             </CommandPalette.List>
                         ))
-                    ) : (<CommandPalette.FreeSearchAction />)}
+                    ) : (<CommandPalette.FreeSearchAction key={"freeSearch"}/>)}
                 </CommandPalette.Page>
             </CommandPalette>
             <div className='settings-Button' onClick={() => setOpen(true)}><Icon name='Cog6ToothIcon' scale={10}/></div>

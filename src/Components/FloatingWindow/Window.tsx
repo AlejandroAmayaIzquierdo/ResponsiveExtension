@@ -168,7 +168,7 @@ const Window = forwardRef<any,WindowProps>(({
       clearTimeout(timeoutId);
 
       timeoutId = setTimeout(() => {
-        if(onDragEnd) onDragEnd({id,top,left,width: contentRect.width,height: contentRect.height});
+        if(onDragEnd) onDragEnd({id,width: contentRect.width,height: contentRect.height});
         setIsResolutionInfoShow(false); 
       }, 500); //There is no way to know when its ended so i did this. 
     });

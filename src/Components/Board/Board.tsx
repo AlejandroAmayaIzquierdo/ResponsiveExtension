@@ -65,16 +65,17 @@ const Board: React.FC<BoardProps> = ({url}) => {
     }
 
     const handleWindowDragEnd = (item: WindowProps) => {
-        const index = layout.findIndex((window) => window.id === item.id);
-        console.log(layout.find((window) => window.id === item.id));
-
-        if (index !== -1) {
-            const updatedLayout = [...layout];
-        
-            updatedLayout[index] = {...updatedLayout[index],...item};
-        
-            setLayout(updatedLayout); //FIXME error of creating old state of layout when resize. 
-        }
+        setLayout((prevLayout) => {
+            const index = prevLayout.findIndex((window) => window.id === item.id);
+    
+            if (index !== -1) {
+                const updatedLayout = [...prevLayout];
+                updatedLayout[index] = { ...updatedLayout[index], ...item };
+                return updatedLayout;
+            }
+    
+            return prevLayout;
+        });
     }
     
     const handleClearBoard = () => {
@@ -93,9 +94,8 @@ const Board: React.FC<BoardProps> = ({url}) => {
     }, []);
 
     useEffect(() => {
-        //FIXME bug when resize load the original layout or at least the last state. 😞
         setWindowRefs(layout.map(() => React.createRef()));
-      }, [layout]);
+      }, [layout.length]);
     
 
     useEffect(() => {
