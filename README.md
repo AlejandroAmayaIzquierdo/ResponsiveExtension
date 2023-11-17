@@ -1,10 +1,10 @@
 # Chrome Extension for visualize better responsive designs
 
-![build](https://github.com/chibat/chrome-extension-typescript-starter/workflows/build/badge.svg)
+[![Google Chrome](https://img.shields.io/badge/Google%20Chrome-4285F4?style=for-the-badge&logo=GoogleChrome&logoColor=white)](https://chromewebstore.google.com/u/1/detail/responsive-extension/dppcabjajpicaohiikhpjgkgkpekloke)
 
-Extension for responsive design
+[Extension](https://chromewebstore.google.com/u/1/detail/responsive-extension/dppcabjajpicaohiikhpjgkgkpekloke) for responsive design
 
-A [Extension](https://chromewebstore.google.com/u/1/detail/responsive-extension/dppcabjajpicaohiikhpjgkgkpekloke) for developers to check responsive desings.
+a extension for developers to check responsive desings.
 
 https://github.com/AlejandroAmayaIzquierdo/ResponsiveExtension/assets/96839165/1e79bd45-348c-44ee-b62c-a6983561ae7a
 
