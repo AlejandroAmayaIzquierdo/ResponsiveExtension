@@ -2,13 +2,11 @@
 
 ![build](https://github.com/chibat/chrome-extension-typescript-starter/workflows/build/badge.svg)
 
-Chrome Extension, TypeScript and Visual Studio Code
+Extension for responsive design
 
-
+A [Extension](https://chromewebstore.google.com/u/1/detail/responsive-extension/dppcabjajpicaohiikhpjgkgkpekloke) for developers to check responsive desings.
 
 https://github.com/AlejandroAmayaIzquierdo/ResponsiveExtension/assets/96839165/1e79bd45-348c-44ee-b62c-a6983561ae7a
-
-
 
 
 # Privacy Policy for Responsive Design Checker Extension
