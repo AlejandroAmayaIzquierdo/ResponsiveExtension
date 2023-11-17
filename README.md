@@ -4,6 +4,13 @@
 
 Chrome Extension, TypeScript and Visual Studio Code
 
+
+
+https://github.com/AlejandroAmayaIzquierdo/ResponsiveExtension/assets/96839165/1e79bd45-348c-44ee-b62c-a6983561ae7a
+
+
+
+
 # Privacy Policy for Responsive Design Checker Extension
 
 ## Overview
