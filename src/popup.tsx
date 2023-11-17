@@ -2,8 +2,14 @@ import React, { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import "./styles.css";
 import { LOCALES, existLocate } from "./i18n/locales";
+import { IntlProvider, useIntl } from "react-intl";
+import { messages } from "./i18n/messages";
 
 const Popup = () => {
+
+  const intl = useIntl();
+
+
   const [currentURL, setCurrentURL] = useState<string>();
 
   useEffect(() => {
@@ -26,28 +32,32 @@ const Popup = () => {
       language = LOCALES.ENGLISH;
     const newTabURL = `chrome-extension://${extensionId}/index.html?url=${currentURL}&lang=${language}`;
 
-    chrome.tabs.create({ url: newTabURL }, (tab) => {
-      console.log("New tab created with ID:", tab.id);
-    });
+    chrome.tabs.create({ url: newTabURL });
   };
 
+
   return (
-    <div className="popup-container">
-      <div className="popup-content">
-        <div className="current-url">
-          <span>Current URL:</span>
-          <p>{currentURL}</p>
+      <div className="popup-container">
+        <div className="popup-content">
+          <div className="current-url">
+            <span>{intl.formatMessage({id: "popup.url"})}</span>
+            <p>{currentURL}</p>
+          </div>
+          <button className="change-background-button" onClick={changeBackground}>
+            {intl.formatMessage({id: "popup.button.message"})}
+          </button>
         </div>
-        <button className="change-background-button" onClick={changeBackground}>
-          are you responsive?
-        </button>
       </div>
-    </div>
   );
 };
 
 const root = createRoot(document.getElementById("root")!);
 
+const langParam = new URLSearchParams(window.location.search).get("lang") || LOCALES.ENGLISH;
+const lang = existLocate(langParam) ? langParam : LOCALES.ENGLISH;
+
 root.render(
-    <Popup />
+  <IntlProvider messages={messages[lang]} locale={lang} defaultLocale={LOCALES.ENGLISH}>
+    <Popup /> 
+  </IntlProvider>
 );

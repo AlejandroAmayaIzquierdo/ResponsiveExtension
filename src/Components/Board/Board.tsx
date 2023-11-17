@@ -114,7 +114,7 @@ const Board: React.FC<BoardProps> = ({url}) => {
                     ref={windowRefs[index]}
                     handleClose={(id) => { handleRemoveItem(id) }} 
                     onDragEnd={(item) => handleWindowDragEnd(item)}  >
-                        <iframe className='innerContent' src={url}></iframe>
+                        <iframe className='innerContent' frameBorder={0} src={url}></iframe>
                     </Window>
                 );
             })}
